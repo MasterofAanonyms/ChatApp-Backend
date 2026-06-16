@@ -10,11 +10,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.6",
+    "cros": "^1.1.0",
     "express": "^5.2.1",
     "mysql2": "^3.22.4",
     "ws": "^8.21.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/mysql": "^2.15.27",
     "@types/node": "^25.9.1",

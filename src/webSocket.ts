@@ -1,34 +1,56 @@
 import { Server } from "http";
-import { WebSocketServer } from "ws"; 
+import { WebSocketServer } from "ws";
+import db from "./db";
 
-export function startWebSocket(server: Server){
+export function startWebSocket(server: Server) {
+  const userConnections = new Map();
 
-    const userConnections = new Map();
+  const wsServer = new WebSocketServer({ server });
 
-    const wsServer = new WebSocketServer({ server });
+  wsServer.on("connection", (ws) => {
+    console.log("Connected to websocket");
 
-    wsServer.on("connection", (ws)=>{
+    ws.on("message", (data) => {
+      const msgData = JSON.parse(data.toString());
 
-        console.log("Connected to websocket");
+      if (msgData.type === "register") {
+        //save to map
 
-        ws.on("message", (data)=>{
+        userConnections.set(msgData.data, ws);
+        console.log("Connection saved!");
+      } else if (msgData.type === "chat") {
+        //send to reciver
 
-            const msgData = JSON.parse(data.toString());
+        const { data, receiver, sender, chatId } = msgData;
 
-            if(msgData.type === "register"){
+        const receiverWs = <WebSocket>userConnections.get(receiver);
 
-                //save to map
+        //save to database
+        const pool = db.promise();
 
-                userConnections.set( msgData.data, ws );
-                console.log("Connection saved!");
+        try {
 
-            }else if(msgData.type === "chat"){
-                //send to reciver
-                console.log(msgData.data);
-            }
+          pool.query(
+            "INSERT INTO chat_history (message, sent_at, chat_chat_id, sender, msg_status_id) VALUES (?,?,?,?,?)",
+            [data, new Date(), chatId, sender, 1],
+          );
 
-        });
+        } catch (err) {
+            console.log(err);
+        }
 
+        //send to receiver
+        if (receiverWs) {
+          const msgData = {
+            message: data,
+            sent_at: new Date().toISOString(),
+            sender: sender,
+          };
+
+          receiverWs.send(JSON.stringify(msgData));
+          console.log("Msg sent");
+        }
+      }
     });
-
+  });
 }

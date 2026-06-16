@@ -4,8 +4,11 @@ import chat from "./routes/chat";
 import chatHistory from "./routes/chat-history";
 import { startWebSocket } from "./webSocket";
 import http from "http";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
