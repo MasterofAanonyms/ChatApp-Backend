@@ -29,7 +29,7 @@ router.get("/get-chats", async (req, res) => {
       );
 
       const [user] = await promise.query<RowDataPacket[]>(
-        "SELECT mobile, fname, lname FROM user WHERE mobile = ? ",
+        "SELECT mobile, fname, lname, img FROM user WHERE mobile = ? ",
         [chat.user_1 === mobile ? chat.user_2 : chat.user_1],
       );
 
