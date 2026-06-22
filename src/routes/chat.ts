@@ -24,7 +24,7 @@ router.get("/get-chats", async (req, res) => {
       const chat = chats[i];
 
       const [message] = await promise.query<RowDataPacket[]>(
-        "SELECT * FROM chat_history WHERE chat_chat_id = ? ORDER BY sent_at DESC LIMIT 1",
+        "SELECT message FROM chat_history WHERE chat_chat_id = ? ORDER BY sent_at DESC LIMIT 1",
         [chat.chat_id],
       );
 
